@@ -47,11 +47,14 @@ def update_future_goal(future_goal_id):
   
   data = request.get_json()
 
-  if not data or 'name' not in data or 'user_id' not in data:
+  if not data:
     return jsonify({'message': 'Invalid input'}), 400
-  
-  future_goal.name = data['name']
-  future_goal.user_id = data['user_id']
+
+  if 'name' in data:
+    future_goal.name = data['name']
+
+  if 'user_id' in data:
+    future_goal.user_id = data['user_id']
 
   db.session.commit()
 
