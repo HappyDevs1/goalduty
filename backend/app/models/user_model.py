@@ -7,3 +7,4 @@ class User(db.Model):
   daily_tasks = db.relationship('DailyTask', backref='user', lazy=True)
   daily_reports = db.relationship('DailyReport', backref='user', lazy=True)
   future_goals = db.relationship('FutureGoal', backref='user', lazy=True)
+  detailed_future_goals = db.Column(db.String(500), nullable=True) 
