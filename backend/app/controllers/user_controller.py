@@ -50,11 +50,14 @@ def update_user(user_id):
   
   data = request.get_json()
 
-  if not data or 'name' not in data or 'email' not in data:
+  if not data:
     return jsonify({'message': 'Invalid input'}), 400
   
-  user.name = data['name']
-  user.email = data['email']
+  if 'name' in data:
+    user.name = data['name']
+  
+  if 'email' in data:
+    user.email = data['email']
 
   db.session.commit()
 
