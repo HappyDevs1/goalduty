@@ -1,6 +1,5 @@
 from flask import Flask
 from .db import db
-from .routes import api_bp
 from dotenv import load_dotenv
 import os
 
@@ -17,16 +16,16 @@ def create_app():
   with app.app_context():
     db.create_all()
   
-  from .routes import user_bp
-  from .routes import future_goals_bp
-  from .routes import daily_tasks_bp
-  from .routes import daily_reports_bp
+  from .routes.user_route import user_bp
+  from .routes.future_goals_route import future_goals_bp
+  from .routes.daily_tasks_route import daily_tasks_bp
+  from .routes.daily_report_route import daily_report_bp
   # Add recommendation routes if necessary
 
   app.register_blueprint(user_bp, url_prefix='/api/users')
   app.register_blueprint(future_goals_bp, url_prefix='/api/future_goals')
   app.register_blueprint(daily_tasks_bp, url_prefix='/api/daily_tasks') 
-  app.register_blueprint(daily_reports_bp, url_prefix='/api/daily_reports')
+  app.register_blueprint(daily_report_bp, url_prefix='/api/daily_reports')
   # Register recommendation routes if necessary
 
   return app
