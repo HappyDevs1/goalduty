@@ -1,14 +1,14 @@
 from flask import Blueprint
-from ..controllers.daily_tasks_controller import (
-    get_all_daily_tasks,
-    get_daily_task_by_id,
-    create_daily_task,
-    update_daily_task
+from ..controllers.future_goals_controller import (
+    get_all_future_goals,
+    get_future_goal_by_id,
+    create_future_goal,
+    update_future_goal
 )
 
-daily_tasks_bp = Blueprint('daily_tasks_bp', __name__)
+future_goals_bp = Blueprint('future_goals_bp', __name__)
 
-daily_tasks_bp.route('/daily_tasks', methods=['GET'])(get_all_daily_tasks)
-daily_tasks_bp.route('/daily_tasks/<int:daily_task_id>', methods=['GET'])(get_daily_task_by_id)
-daily_tasks_bp.route('/daily_tasks', methods=['POST'])(create_daily_task)
-daily_tasks_bp.route('/daily_tasks/<int:daily_task_id>', methods=['PUT'])(update_daily_task)
+future_goals_bp.route('/future_goals', methods=['GET'])(get_all_future_goals)
+future_goals_bp.route('/future_goals/<int:future_goals_id>', methods=['GET'])(get_future_goal_by_id)
+future_goals_bp.route('/future_goals', methods=['POST'])(create_future_goal)
+future_goals_bp.route('/future_goals/<int:future_goals_id>', methods=['PUT'])(update_future_goal)
