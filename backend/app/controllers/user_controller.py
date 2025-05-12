@@ -3,7 +3,7 @@ from ..models.user_model import User
 from ..db import db
 
 def get_all_users():
-  users = User.query.app()
+  users = User.query.all()
   return jsonify([{
     'id': user.id,
     'name': user.name,
