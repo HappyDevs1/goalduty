@@ -2,6 +2,7 @@ from ..db import db
 
 class DailyReport(db.Model):
   id = db.Column(db.Integer, primary_key=True)
+  summary = db.Column(db.String(500), nullable=False)
   tasks_status = db.Column(db.String(500), nullable=False)
   recommendations = db.Column(db.String(500), nullable=True)
   date = db.Column(db.Date, nullable=False)
