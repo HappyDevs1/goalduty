@@ -47,11 +47,8 @@ def update_daily_task(daily_task_id):
     
     data = request.get_json()
 
-    if not data or 'name' not in data or 'user_id' not in data:
+    if not data:
         return jsonify({'message': 'Invalid input'}), 400
-    
-    daily_task.name = data['name']
-    daily_task.user_id = data['user_id']
 
     if 'name' in data:
         daily_task.name = data['name']
