@@ -53,12 +53,17 @@ def update_daily_task(daily_task_id):
     daily_task.name = data['name']
     daily_task.user_id = data['user_id']
 
+    if 'name' in data:
+        daily_task.name = data['name']
+
+    if 'user_id' in data:
+        daily_task.user_id = data['user_id']
+
     db.session.commit()
 
     return jsonify({
         'id': daily_task.id,
         'name': daily_task.name,
-        'user_id': daily_task.user_id
     }), 200
 
 def delete_daily_task(daily_task_id):
