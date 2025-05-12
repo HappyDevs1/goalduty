@@ -13,7 +13,7 @@ def create_app():
 
   db.init_app(app)
 
-  from .models import user_model, future_goals_model, daily_tasks_model, daily_reports_model
+  from .models import user_model, future_goals_model, daily_tasks_model, daily_report_model
   with app.app_context():
     db.create_all()
   
@@ -28,5 +28,5 @@ def create_app():
   app.register_blueprint(daily_tasks_bp, url_prefix='/api/daily_tasks') 
   app.register_blueprint(daily_reports_bp, url_prefix='/api/daily_reports')
   # Register recommendation routes if necessary
-  
+
   return app
