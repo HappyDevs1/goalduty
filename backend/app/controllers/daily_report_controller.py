@@ -8,7 +8,9 @@ def get_all_daily_reports():
         'id': report.id,
         'user_id': report.user_id,
         'date': report.date,
-        'report': report.report
+        'summary': report.summary,
+        'task_status': report.task_status,
+        'recommendations': report.recommendations
     } for report in daily_reports]), 200
 
 def get_daily_report_by_id(daily_report_id):
@@ -21,7 +23,9 @@ def get_daily_report_by_id(daily_report_id):
         'id': daily_report.id,
         'user_id': daily_report.user_id,
         'date': daily_report.date,
-        'report': daily_report.report
+        'summary': daily_report.summary,
+        'task_status': daily_report.task_status,
+        'recommendations': daily_report.recommendations
     }), 200
 
 def create_daily_report():
@@ -39,7 +43,9 @@ def create_daily_report():
         'id': new_daily_report.id,
         'user_id': new_daily_report.user_id,
         'date': new_daily_report.date,
-        'report': new_daily_report.report
+        'summary': new_daily_report.summary,
+        'task_status': new_daily_report.task_status,
+        'recommendations': new_daily_report.recommendations
     }), 201
 
 def update_daily_report(daily_report_id):
@@ -50,12 +56,14 @@ def update_daily_report(daily_report_id):
     
     data = request.get_json()
 
-    if not data or 'user_id' not in data or 'date' not in data or 'report' not in data:
+    if not data:
         return jsonify({'message': 'Invalid input'}), 400
     
-    daily_report.user_id = data['user_id']
-    daily_report.date = data['date']
-    daily_report.report = data['report']
+    if 'task_status' in data:
+        daily_report.task_status = data['task_status']
+
+    if 'recommendations' in data:
+        daily_report.recommendations = data['recommendations']
 
     db.session.commit()
 
@@ -63,7 +71,9 @@ def update_daily_report(daily_report_id):
         'id': daily_report.id,
         'user_id': daily_report.user_id,
         'date': daily_report.date,
-        'report': daily_report.report
+        'summary': daily_report.summary,
+        'task_status': daily_report.task_status,
+        'recommendations': daily_report.recommendations
     }), 200
 
 def delete_daily_report(daily_report_id):
@@ -87,5 +97,7 @@ def get_daily_report_by_user_id(user_id):
         'id': report.id,
         'user_id': report.user_id,
         'date': report.date,
-        'report': report.report
+        'summary': report.summary,
+        'task_status': report.task_status,
+        'recommendations': report.recommendations
     } for report in daily_reports]), 200
