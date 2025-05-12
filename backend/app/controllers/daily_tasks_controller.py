@@ -56,6 +56,9 @@ def update_daily_task(daily_task_id):
     if 'user_id' in data:
         daily_task.user_id = data['user_id']
 
+    if 'non_negotiable' in data:
+        daily_task.non_negotiable = data['non_negotiable']
+
     db.session.commit()
 
     return jsonify({
