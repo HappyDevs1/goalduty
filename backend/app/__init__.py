@@ -21,6 +21,7 @@ def create_app():
   from .routes.daily_tasks_route import daily_tasks_bp
   from .routes.daily_report_route import daily_report_bp
   from .routes.ai_model_route import ai_bp
+  from .routes.journal_routes import journal_bp
   # Add recommendation routes if necessary
 
   app.register_blueprint(user_bp, url_prefix='/api/users')
@@ -28,6 +29,7 @@ def create_app():
   app.register_blueprint(daily_tasks_bp, url_prefix='/api/daily_tasks') 
   app.register_blueprint(daily_report_bp, url_prefix='/api/daily_reports')
   app.register_blueprint(ai_bp, url_prefix='/api/ai')
+  app.register_blueprint(journal_bp, url_prefix='/api/journal')
   # Register recommendation routes if necessary
 
   return app
