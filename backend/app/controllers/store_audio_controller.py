@@ -7,6 +7,7 @@ load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SERVICE_SUPABASE_KEY = os.getenv("SERVICE_SUPABASE_KEY")
+STORAGE_BUCKET_NAME = os.getenv("STORAGE_BUCKET_NAME")
 
 superbase = create_client(SUPABASE_URL, SERVICE_SUPABASE_KEY)
 
@@ -14,7 +15,7 @@ superbase = create_client(SUPABASE_URL, SERVICE_SUPABASE_KEY)
 def upload_to_storage(file_obj, filename):
   bucket = superbase.storage.from_("goalduty-audio")
   bucket.upload(filename, file_obj)
-  public_url = f"{SUPABASE_URL}/storage/v1/object/public/audio_uploads/{filename}"
+  public_url = f"{SUPABASE_URL}/storage/v1/object/public/{STORAGE_BUCKET_NAME}/{filename}"
   return public_url
 
 # def store_audio():
