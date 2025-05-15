@@ -1,12 +1,4 @@
-# import whisper
-
-# Production ready function to transcribe audio
-
-# def transcribe_audio_to_text(audio_file):
-#     model = whisper.load_model("base")
-#     result = model.transcribe(audio_file)
-#     return result["text"]
-
+from flask import request, jsonify
 import io
 import whisper
 import torchaudio
@@ -35,3 +27,29 @@ def transcribe_audio_to_text(audio_bytes):
 
     result = model.transcribe(audio)
     return result["text"]
+
+def transcribe():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    try:
+        # Read file as bytes
+        audio_bytes = file.read()
+        result = transcribe_audio_to_text(audio_bytes)
+        return jsonify({"text": result}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# import whisper
+
+# Production ready function to transcribe audio
+
+# def transcribe_audio_to_text(audio_file):
+#     model = whisper.load_model("base")
+#     result = model.transcribe(audio_file)
+#     return result["text"]
