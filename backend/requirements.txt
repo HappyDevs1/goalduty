@@ -7,3 +7,6 @@ torch
 ffmpeg-python
 supabase
 os
+soundfile
+numpy
+torchaudio
