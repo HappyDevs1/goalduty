@@ -1,22 +1,37 @@
-from huggingface_hub import InferenceClient
-import os
+# import whisper
 
-hf_api_key = os.getenv("HUGGINGFACE_TOKEN")
+# Production ready function to transcribe audio
 
-os.environ['CURL_CA_BUNDLE'] = ''
-os.environ['REQUESTS_CA_BUNDLE'] = ''
+# def transcribe_audio_to_text(audio_file):
+#     model = whisper.load_model("base")
+#     result = model.transcribe(audio_file)
+#     return result["text"]
 
-from dotenv import load_dotenv
-load_dotenv()
+import io
+import whisper
+import torchaudio
+import torch
 
-test_audio = "C:/Users/i7 dell/Downloads/videoplayback.m4a"
+model = whisper.load_model("base")
 
-def transcribe_audio_to_text(test_audio):
-  client = InferenceClient(
-    provider="fal-ai",
-    api_key=hf_api_key,
-  )
+def transcribe_audio_to_text(audio_bytes):
+    audio_file = io.BytesIO(audio_bytes)
 
-  output = client.automatic_speech_recognition(test_audio, model="openai/whisper-large-v3")
+    # Load audio with torchaudio
+    waveform, sample_rate = torchaudio.load(audio_file)
 
-  return(output)
+    # Resample if needed
+    if sample_rate != 16000:
+        resampler = torchaudio.transforms.Resample(orig_freq=sample_rate, new_freq=16000)
+        waveform = resampler(waveform)
+        sample_rate = 16000
+
+    # Convert to mono if stereo
+    if waveform.shape[0] > 1:
+        waveform = torch.mean(waveform, dim=0, keepdim=True)
+
+    # Convert waveform to numpy array for Whisper
+    audio = waveform.squeeze().numpy()
+
+    result = model.transcribe(audio)
+    return result["text"]
