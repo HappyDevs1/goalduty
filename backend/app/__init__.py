@@ -12,7 +12,7 @@ def create_app():
 
   db.init_app(app)
 
-  from .models import user_model, future_goals_model, daily_tasks_model, daily_report_model
+  from .models import user_model, future_goals_model, daily_tasks_model, daily_report_model, user_messages_model, ai_messages_model
   with app.app_context():
     db.create_all()
   
