@@ -10,3 +10,6 @@ os
 soundfile
 numpy
 torchaudio
+transformers
+huggingface_hub
+opeanai
