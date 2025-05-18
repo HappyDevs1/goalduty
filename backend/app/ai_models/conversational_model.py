@@ -2,6 +2,7 @@ import os
 from flask import request, jsonify
 from openai import OpenAI
 from ..db import db
+from sqlalchemy.orm.attributes import flag_modified
 from ..models.user_model import User
 from ..models.ai_messages_model import AIMessages
 from ..models.user_messages_model import UserMessages
@@ -92,23 +93,29 @@ def get_followup():
         user_in_messages = UserMessages.query.filter_by(user_id=user_id).first()
 
         if user_in_messages:
-            user_in_messages.messages = []
+            if not isinstance(user_in_messages.messages, list):
+                user_in_messages.messages = []
             user_in_messages.messages.append(user_input)
+            flag_modified(user_in_messages, "messages") 
+            db.session.commit()
         else:
-            user_in_messages = UserMessages(user_id=user_id, messages=user_input)
+            user_in_messages = UserMessages(user_id=user_id, messages=[user_input])
             db.session.add(user_in_messages)
+            db.session.commit()
 
         # Save the AI message
         user_in_ai_message = AIMessages.query.filter_by(user_id=user_id).first()
-
+        
         if user_in_ai_message:
-            user_in_ai_message.messages = []
+            if not isinstance(user_in_ai_message.messages, list):
+                user_in_ai_message.messages = []
             user_in_ai_message.messages.append(followup_question)
+            flag_modified(user_in_ai_message, "messages")
+            db.session.commit()
         else:
-            user_in_ai_message = AIMessages(user_id=user_id, messages=followup_question)
+            user_in_ai_message = AIMessages(user_id=user_id, messages=[followup_question])
             db.session.add(user_in_ai_message)
-
-        db.session.commit()
+            db.session.commit()
             
         return jsonify({"response": followup_question})
     except Exception as e:
