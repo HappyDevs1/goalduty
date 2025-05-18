@@ -6,6 +6,7 @@ from ..db import db
 from ..models.user_model import User
 from ..models.ai_messages_model import AIMessages
 from ..models.user_messages_model import UserMessages
+from ..models.future_goals_model import FutureGoal
 
 # Set up OpenAI client
 token = os.environ["OPENAI_API_KEY"]
@@ -71,6 +72,12 @@ def generate_daily_tasks():
         ai_msgs = ai_message_record.messages if isinstance(ai_message_record.messages, list) else [ai_message_record.messages]
 
         result = generate_openai_response(ai_msgs, user_msgs)
+
+        # Save results to the database
+        daily_task_summary = FutureGoal(user_id=user_id, name=result)
+        db.session.add(daily_task_summary)
+        db.session.commit()
+
         return jsonify({"daily_tasks": result}), 200
 
     except Exception as e:
