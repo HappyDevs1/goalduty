@@ -1,11 +1,15 @@
+"use client";
+
 import { Clock } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function Journal () {
+  const router = useRouter();
   return (
     <div className="flex flex-col items-center  h-screen mt-5">
       <h1 className="text-2xl font-bold mb-4">Journal</h1>
       <div className="">
-        <div className="bg-gray-300 px-8 py-16 rounded-lg shadow-md">
+        <div className="bg-gray-300 px-8 py-16 rounded-lg shadow-md" onClick={() => router.push('/journaling')}>
           <p><span className="text-lg">+</span> New Journal</p>
         </div>
       </div>
