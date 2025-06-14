@@ -1,14 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Goal } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const [isLoggedIn, setIsLoggedIn] = useState<any>(false);
   const router = useRouter();
+
+  const checkLoginStatus = () => {
+    try {
+      const user = localStorage.getItem("user");
+    const expiresAt = localStorage.getItem("expiresAt");
+
+    const isValidUser = user && expiresAt && new Date().getTime() < parseInt(expiresAt);
+    setIsLoggedIn(isValidUser);
+    } catch (error) {
+      console.error("Error checking login status:", error);
+      setIsLoggedIn(false);
+    }
+  }
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+
   return (
     <nav className="bg-white shadow-md p-4">
       <div className="container mx-auto flex justify-between items-center">
@@ -42,12 +60,15 @@ export const Navbar = () => {
 
         {/* Desktop Navigation */}
         <ul className="hidden md:flex space-x-6 items-center">
-          <li>
+          {
+            isLoggedIn && (
+              <>
+              <li>
             <Link href="/" className="hover:text-blue-600">
               Tasks
             </Link>
           </li>
-          <li>
+              <li>
             <Link href="/journal" className="hover:text-blue-600">
               Journal
             </Link>
@@ -67,18 +88,24 @@ export const Navbar = () => {
               Login
             </button>
           </li>
+              </>
+            )
+          }
         </ul>
       </div>
 
       {/* Mobile Menu */}
       {isOpen && (
         <ul className="md:hidden absolute top-16 left-0 w-full bg-white shadow-md flex flex-col items-center space-y-4 p-4">
-          <li>
+          {
+            isLoggedIn && (
+              <>
+              <li>
             <Link href="/" className="hover:text-blue-600" onClick={() => setIsOpen(false)}>
               Tasks
             </Link>
           </li>
-          <li>
+              <li>
             <Link href="/journal" className="hover:text-blue-600" onClick={() => setIsOpen(false)}>
               Journal
             </Link>
@@ -93,6 +120,9 @@ export const Navbar = () => {
               Chat
             </Link>
           </li>
+              </>
+            )
+          }
           <li>
             <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" onClick={() => router.push("/login")}>
               Login

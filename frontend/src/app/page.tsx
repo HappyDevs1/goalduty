@@ -1,65 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { loginUser } from "./services/user";
+import React, { useState, useEffect } from "react";
+import Tasks from "./tasks/page";
+import Login from "./login/page";
 
-export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const router = useRouter();
+export default function Home() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
-  const handleLogin = async () => {
-    try {
-      setError("");
+  useEffect(() => {
+    const checkAuth = () => {
+      try {
+        const user = localStorage.getItem("user");
+        const expiresAt = localStorage.getItem("expiresAt");
+        const isValidUser =
+          user && expiresAt && new Date().getTime() < parseInt(expiresAt);
 
-    const res = await loginUser({ email, password });
+        setIsLoggedIn(!!isValidUser);
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setIsLoggedIn(false);
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
 
-    if (!res) {
-      setError("Login failed");
-      return;
-    }
+    checkAuth();
+  }, []);
 
-    const user: any = res.data;
+  if (checkingAuth) {
+    return <p className="text-center mt-10">Checking authentication...</p>;
+  }
 
-    // Store in localStorage with expiry
-    const expiresAt = new Date().getTime() + 30 * 60 * 1000; // 30 minutes
-    localStorage.setItem("user", user);
-    localStorage.setItem("expiresAt", expiresAt.toString());
-
-    router.push("/tasks");
-    } catch (error) {
-      console.error("Login error:", error);
-      setError("Login failed. Please check your credentials.");
-    }
-  };
-
-  return (
-    <div className="h-screen flex flex-col justify-center items-center">
-      <div className="w-80 bg-white p-6 rounded shadow space-y-4">
-        <h2 className="text-xl font-bold">Login</h2>
-        <input
-          className="w-full border p-2 rounded"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          className="w-full border p-2 rounded"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        <button
-          className="w-full bg-blue-500 text-white py-2 rounded"
-          onClick={handleLogin}
-        >
-          Login
-        </button>
-      </div>
-    </div>
-  );
+  return isLoggedIn ? <Tasks /> : <Login />;
 }
