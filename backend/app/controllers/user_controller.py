@@ -25,13 +25,13 @@ def get_user_by_id(user_id):
 def create_user():
   data = request.get_json()
 
-  if not data or 'name' not in data or 'email' not in data:
+  if not data or 'name' not in data or 'email' not in data or 'password' not in data:
     return jsonify({'message': 'Invalid input'}), 400
   
   if User.query.filter_by(email=data['email']).first():
     return jsonify({'message': 'Email already exists'}), 400
   
-  new_user = User(name=data['name'], email=data['email'])
+  new_user = User(name=data['name'], email=data['email'], password=data['password'])
 
   db.session.add(new_user)
   db.session.commit()
@@ -39,7 +39,8 @@ def create_user():
   return jsonify({
     'id': new_user.id,
     'name': new_user.name,
-    'email': new_user.email
+    'email': new_user.email,
+    'password': new_user.password
   }), 201
 
 def update_user(user_id):
@@ -58,6 +59,9 @@ def update_user(user_id):
   
   if 'email' in data:
     user.email = data['email']
+
+  if 'password' in data:
+    user.password = data['password']
 
   db.session.commit()
 
