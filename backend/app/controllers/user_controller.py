@@ -84,9 +84,11 @@ def login_user():
     return jsonify({'message': 'Invalid input'}), 400
   
   user = User.query.filter_by(email=data['email']).first()
+  password = User.query.filter_by(password=data['password']).first()
 
-  if not user or not user.check_password(data['password']):
+  if not user or not password:
     return jsonify({'message': 'Invalid email or password'}), 401
+  
   return jsonify({
     'id': user.id,
     'name': user.name,
