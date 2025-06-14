@@ -3,6 +3,7 @@ from flask import request, jsonify
 from openai import OpenAI
 from ..db import db
 from ..models.future_goals_model import FutureGoal
+import re
 
 token = os.environ["OPENAI_API_KEY"]
 endpoint = "https://models.github.ai/inference"
@@ -57,14 +58,12 @@ def summarize_daily_tasks(user_task):
             {
                 "role": "system",
                 "content": (
-                    "You are a helpful assistant that cleans up, summarizes one like of long sentence into few words of daily tasks"
-                    "When the user gives you a message, do the following:\n\n"
-                    "1. Provide a clean and concise umbrella word to name the long description of a task into fewer words lesser than 3 words.\n"
-                    "2. Make sure the word that represent the task is accurate to what the user must do in the task.\n"
+                    "You are a helpful assistant that summarizes long task descriptions into short daily tasks. "
+                    "For each line given, respond with a very short task name (ideally under 3 words). "
                     "Respond in this format:\n"
-                    "Task 1: <generated task word>\n"
-                    "Task 2: <generated task word>\n"
-                    "Task 3: <generated task word>\n"
+                    "Task 1: <task name>\n"
+                    "Task 2: <task name>\n"
+                    "Task 3: <task name>"
                 ),
             },
             {
@@ -75,23 +74,15 @@ def summarize_daily_tasks(user_task):
         model=model_name
     )
 
-    # Extract the text from the response
     content = response.choices[0].message.content.strip()
 
-    # Simple parsing logic assuming the format is consistent
-    lines = content.split("\n")
-    task1 = ""
-    task2 = ""
-    task3 = ""
-    for line in lines:
-        if line.lower().startswith("Task 1:"):
-            task1 = line.split(":", 1)[1].strip()
-        elif line.lower().startswith("Task 2:"):
-            task2 = line.split(":", 1)[1].strip()
-        elif line.lower().startswith("Task 3:"):
-            task3 = line.split(":", 1)[1].strip()
+    # Fallback-safe parser
+    tasks = {}
+    for i in range(1, 4):
+        match = re.search(rf"Task {i}:\s*(.+)", content, re.IGNORECASE)
+        tasks[f"Task {i}"] = match.group(1).strip() if match else ""
 
-    return {"Task 1": task1, "Task 2": task2, "Task 3": task3}
+    return tasks
 
 def get_summary():
     data = request.get_json()
@@ -114,6 +105,9 @@ def get_summarized_daily_tasks():
         return jsonify({"error": "Missing 'user_id' field in JSON body"}), 400
     try:
         user_tasks = FutureGoal.query.filter_by(user_id=user_id).first()
+
+        if not user_tasks or not user_tasks.name:
+            return jsonify({"error": "No tasks found for this user"}), 404
 
         result = summarize_daily_tasks(user_tasks.name)
         return jsonify(result)
