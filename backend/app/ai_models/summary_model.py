@@ -106,7 +106,7 @@ def get_summary():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-def get_daily_tasks():
+def get_summarized_daily_tasks():
     data = request.get_json()
     user_id = data.get("user_id")
 
