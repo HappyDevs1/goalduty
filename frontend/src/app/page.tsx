@@ -11,7 +11,8 @@ export default function LoginPage() {
   const router = useRouter();
 
   const handleLogin = async () => {
-    setError("");
+    try {
+      setError("");
 
     const res = await loginUser({ email, password });
 
@@ -28,6 +29,10 @@ export default function LoginPage() {
     localStorage.setItem("expiresAt", expiresAt.toString());
 
     router.push("/tasks");
+    } catch (error) {
+      console.error("Login error:", error);
+      setError("Login failed. Please check your credentials.");
+    }
   };
 
   return (
