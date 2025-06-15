@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CheckboxWithLabel from "../components/CheckboxWithLabel";
+import { getTasksByUser } from "../services/tasks";
 
 type Task = {
   id: string;
@@ -11,29 +12,70 @@ type Task = {
 
 const Tasks: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"non_negotiable" | "negotiable">("non_negotiable");
+  const [nonNegotiable, setNonNegotiable] = useState<Task[]>([]);
+  const [negotiable, setNegotiable] = useState<Task[]>([]);
 
-  const [tasks, setTasks] = useState<{
-    non_negotiable: Task[];
-    negotiable: Task[];
-  }>({
-    non_negotiable: [
-      { id: "1", label: "Finish report", checked: false },
-      { id: "2", label: "Email client", checked: false },
-    ],
-    negotiable: [
-      { id: "3", label: "Buy groceries", checked: false },
-      { id: "4", label: "Call mom", checked: false },
-    ],
-  });
-
-  const handleCheckboxChange = (tab: "non_negotiable" | "negotiable", id: string, checked: boolean) => {
-    setTasks((prev) => ({
-      ...prev,
-      [tab]: prev[tab].map((task) =>
-        task.id === id ? { ...task, checked } : task
-      ),
-    }));
+  const handleCheckboxChange = (
+    tab: "non_negotiable" | "negotiable",
+    id: string,
+    checked: boolean
+  ) => {
+    if (tab === "non_negotiable") {
+      setNonNegotiable((prev) =>
+        prev.map((task) => (task.id === id ? { ...task, checked } : task))
+      );
+    } else {
+      setNegotiable((prev) =>
+        prev.map((task) => (task.id === id ? { ...task, checked } : task))
+      );
+    }
   };
+
+const handleFetchTasks = async () => {
+  try {
+    const user = localStorage.getItem("user");
+    const userId = user ? JSON.parse(user).id : "";
+
+    const tasksResponse = await getTasksByUser(userId);
+
+    const allTasks = tasksResponse.data;
+
+    const nonNegotiableList: Task[] = [];
+    const negotiableList: Task[] = [];
+
+    allTasks.forEach((taskGroup: any) => {
+      const nameObj = taskGroup.name;
+
+      if (typeof nameObj === "object") {
+        Object.entries(nameObj).forEach(([key, value], index) => {
+          const flattenedTask: Task = {
+            id: `${taskGroup.id}-${index}`, // unique ID per subtask
+            label: value as string,
+            checked: taskGroup.completed,
+          };
+
+          if (taskGroup.non_negotiable) {
+            nonNegotiableList.push(flattenedTask);
+          } else {
+            negotiableList.push(flattenedTask);
+          }
+        });
+      }
+    });
+
+    setNonNegotiable(nonNegotiableList);
+    setNegotiable(negotiableList);
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+  }
+};
+
+
+  useEffect(() => {
+    handleFetchTasks();
+  }, []);
+
+  const currentTasks = activeTab === "non_negotiable" ? nonNegotiable : negotiable;
 
   return (
     <div className="w-full max-w-md mx-auto p-4">
@@ -49,17 +91,17 @@ const Tasks: React.FC = () => {
                 : "text-gray-600 hover:text-blue-500"
             }`}
           >
-            {tab}
+            {tab.replace("_", " ")}
           </button>
         ))}
       </div>
 
       {/* Task List */}
       <div className="space-y-3">
-        {tasks[activeTab].length === 0 ? (
+        {currentTasks.length === 0 ? (
           <p className="text-gray-500 text-center">No tasks available.</p>
         ) : (
-          tasks[activeTab].map((task) => (
+          currentTasks.map((task) => (
             <CheckboxWithLabel
               key={task.id}
               id={task.id}
