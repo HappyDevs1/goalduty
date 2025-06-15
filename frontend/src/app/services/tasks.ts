@@ -62,7 +62,7 @@ export const getAllTasks = async () => {
 
 export const getTasksByUser = async (userId: string) => {
   try {
-    const response = await api.get(`/daily_task/user/${userId}`);
+    const response = await api.get(`/daily_tasks/user/${userId}`);
     return response;
   } catch (error) {
     console.error("Error fetching tasks by user:", error);
