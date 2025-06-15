@@ -3,7 +3,9 @@ from flask import request, jsonify
 from openai import OpenAI
 from ..db import db
 from ..models.future_goals_model import FutureGoal
+from..models.daily_tasks_model import DailyTask
 import re
+import json
 
 token = os.environ["OPENAI_API_KEY"]
 endpoint = "https://models.github.ai/inference"
@@ -110,6 +112,12 @@ def get_summarized_daily_tasks():
             return jsonify({"error": "No tasks found for this user"}), 404
 
         result = summarize_daily_tasks(user_tasks.name)
+
+        new_tasks = DailyTask(user_id=user_id, name=json.dumps(result))
+
+        db.session.add(new_tasks)
+        db.session.commit()
+
         return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
