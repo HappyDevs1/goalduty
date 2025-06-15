@@ -59,3 +59,13 @@ export const getAllGoals = async () => {
     throw error;
   }
 };
+
+export const getGoalsByUser = async (userId: string) => {
+  try {
+    const response = await api.get(`/future_goals/user/${userId}`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching goals by user:", error);
+    throw error;
+  }
+};
