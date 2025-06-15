@@ -19,7 +19,9 @@ def get_daily_task_by_id(daily_task_id):
     return jsonify({
         'id': daily_task.id,
         'name': daily_task.name,
-        'user_id': daily_task.user_id
+        'user_id': daily_task.user_id,
+        'completed': daily_task.completed,
+        'non_negotiable': daily_task.non_negotiable
     }), 200
 
 def create_daily_task():
@@ -64,6 +66,9 @@ def update_daily_task(daily_task_id):
     return jsonify({
         'id': daily_task.id,
         'name': daily_task.name,
+        'user_id': daily_task.user_id,
+        'completed': daily_task.completed,
+        'non_negotiable': daily_task.non_negotiable
     }), 200
 
 def delete_daily_task(daily_task_id):
@@ -90,7 +95,8 @@ def mark_daily_task_completed(daily_task_id):
         'id': daily_task.id,
         'name': daily_task.name,
         'user_id': daily_task.user_id,
-        'completed': daily_task.completed
+        'completed': daily_task.completed,
+        'non_negotiable': daily_task.non_negotiable
     }), 200
 
 def get_daily_tasks_by_user(user_id):
@@ -102,5 +108,7 @@ def get_daily_tasks_by_user(user_id):
     return jsonify([{
         'id': task.id,
         'name': task.name,
-        'user_id': task.user_id
+        'user_id': task.user_id,
+        'completed': task.completed,
+        'non_negotiable': task.non_negotiable,
     } for task in daily_tasks]), 200
